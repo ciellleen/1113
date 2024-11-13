@@ -1,0 +1,79 @@
+# **메모리 할당하기**
+
+메모리를 사용하려면 malloc 함수로 사용할 메모리 공간을 확보해야 함. (memory allocation). 이때 필요한 메모리 크기는 바이트 단위로 지정함(메모리 할당, 해제 함수는 stdlib.h 헤더 파일에 선언되어 있음).
+
+- **포인터 = malloc(크기);**
+    - **void *malloc(size_t _Size);**
+    - 성공하면 메모리 주소를 반환, 실패하면 NULL을 반환
+
+다음 내용을 소스 코드 편집 창에 입력한 뒤 실행해보자. 
+
+만약 컴파일할 때 "error C2440: '=': 'void *'에서 'int *'(으)로 변환할 수 없습니다." 에러가 발생한다면 파일의 확장자가 .c가 맞는지 확인하자. 파일 확장자가 .cpp이면 C++ 컴파일러를 사용하므로 에러가 발생함. 확장자는 반드시 .c로 지정하여 C 컴파일러를 사용하도록 만들어야 함.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+   int num1 = 20;
+   int* numPtr1;
+
+   numPtr1 = &num1;
+
+   int* numPtr2;
+
+   numPtr2 = (int*)malloc(sizeof(int));
+
+   printf("%p\n", numPtr1);
+   
+   
+   printf("%p\n", numPtr1);
+
+   free(numPtr2);
+
+   return 0;
+}
+```
+
+<aside>
+💡
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/43f4c680-a7ab-4f2d-b233-d37ec40472ce/07e01a72-83b5-46f4-8cc7-ad82f9523697/image.png)
+
+</aside>
+
+메모리를 할당할 때는 malloc 함수를 사용하며 할당할 메모리 공간의 크기를 넣어줌. 여기서는 sizeof 연산자를 사용하여 int의 크기(4바이트)만큼 메모리를 할당했음. 특히 원하는 시점에 원하는 만큼 메모리를 할당할 수 있다고 하여 동적 메모리 할당(dynamic memory allocation)이라 부름.
+
+<aside>
+💡
+
+`numPtr2 = **malloc(sizeof(int))**;    // int의 크기 4바이트만큼 동적 메모리 할당`
+
+</aside>
+
+printf 함수로 numPtr1과 numPtr2의 값을 출력해보면 메모리 주소가 출력됨.
+
+<aside>
+💡
+
+```
+printf("%p\n", numPtr1);    
+                           
+
+printf("%p\n", numPtr2);    
+```
+
+</aside>
+
+여기서 numPtr1에는 일반 변수의 메모리 주소를 할당했고, numPtr2에는 malloc 함수로 메모리를 할당했음. 같은 메모리 주소라도 내부적으로는 약간의 차이가 있음. 스택과 힙 두 가지인데 변수는 스택(stack)에 생성되며 malloc 함수는 힙(heap) 부분의 메모리를 사용함(스택, 힙의 위치와 커지는 방향은 운영체제 및 플랫폼에 따라 달라질 수 있음).
+
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/43f4c680-a7ab-4f2d-b233-d37ec40472ce/328680b5-8105-4037-adef-3146d565278c/image.png)
+
+스택과 힙의 큰 차이점은 메모리 해제임. 스택에 생성된 변수는 사용한 뒤 따로 처리를 해주지 않아도 되지만 malloc 함수를 사용하여 힙에서 할당한 메모리는 반드시 해제를 해주어야 함. 따라서 다음과 같이 free 함수로 메모리를 해제함.
+
+free(포인터);       void free(void *_Block);
+
+`free(numPtr2);    // 동적으로 할당한 메모리 해제`
+
+메모리 해제는 선택이 아닌 필수임. 예제는 별로 하는 일이 없는 간단한 프로그램이지만 실무에서는 메모리를 자주, 많이 할당함.  따라서 메모리를 할당만 하고 해제를 해주지 않으면 결국에는 시스템의 메모리가 부족해지므로 운영체제가 프로그램을 강제로 종료시키거나 메모리 할당에 실패하게 됨. 특히 메모리를 해제하지 않아 메모리 사용량이 계속 증가하는 현상을 메모리 누수(memory leak)라 부름.
